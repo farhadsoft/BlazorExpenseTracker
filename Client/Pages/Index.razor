@@ -1,0 +1,68 @@
+﻿@page "/"
+@inject IExpenseService ExpenseService
+@inject NavigationManager NavigationManager
+
+<PageTitle>Home</PageTitle>
+
+
+<div style=" display: flex; flex-direction:column; justify-content:center">
+    <div style="display:flex; justify-content:end">
+        <a href="/expense">
+            <svg style="width:50px; cursor:pointer " class="svg-icon" viewBox="0 0 20 20">
+                <path d="M14.613,10c0,0.23-0.188,0.419-0.419,0.419H10.42v3.774c0,0.23-0.189,0.42-0.42,0.42s-0.419-0.189-0.419-0.42v-3.774H5.806c-0.23,0-0.419-0.189-0.419-0.419s0.189-0.419,0.419-0.419h3.775V5.806c0-0.23,0.189-0.419,0.419-0.419s0.42,0.189,0.42,0.419v3.775h3.774C14.425,9.581,14.613,9.77,14.613,10 M17.969,10c0,4.401-3.567,7.969-7.969,7.969c-4.402,0-7.969-3.567-7.969-7.969c0-4.402,3.567-7.969,7.969-7.969C14.401,2.031,17.969,5.598,17.969,10 M17.13,10c0-3.932-3.198-7.13-7.13-7.13S2.87,6.068,2.87,10c0,3.933,3.198,7.13,7.13,7.13S17.13,13.933,17.13,10"></path>
+            </svg>
+        </a>
+    </div>
+
+    <div style="display:flex; flex-direction:column; text-align:center;">
+        <p style="color:gray">Total Expenses</p>
+        <h2 style="font-weight:600; margin-top:-10px"> $@Decimal.Round(@ExpenseService.TotalExpenses, 2)</h2>
+    </div>
+    @foreach (var expense in @expenses)
+    {
+        <div style=" border-bottom: 2px solid lightgray; margin-bottom:12px;  padding-top:32px ">
+
+            <div style="display:flex; flex-direction: row; width:100%; cursor:pointer ; align-items:center; ">
+                <div style="height:64px; width: 100%;">
+                    <p style="font-weight:600">@expense.Title</p>
+                    <p style="color:gray">@expense.CreatedAt.ToString("dd MMM yyyy hh:mm tt")</p>
+                </div>
+                <div style="padding-right:12px">
+                    $@Decimal.Round(@expense.Amount, 2)
+                </div>
+                <div @onclick="() => OpenEditForm(expense.Id)" style="padding:16px; cursor: pointer">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil" viewBox="0 0 16 16"> <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z" /> </svg>
+                </div>
+                <div style=" padding:16px; background-color:antiquewhite; cursor:pointer ;">
+                    <svg style="width:18px" class="svg-icon" viewBox="0 0 20 20">
+                        <path d="M7.083,8.25H5.917v7h1.167V8.25z M18.75,3h-5.834V1.25c0-0.323-0.262-0.583-0.582-0.583H7.667
+                                c-0.322,0-0.583,0.261-0.583,0.583V3H1.25C0.928,3,0.667,3.261,0.667,3.583c0,0.323,0.261,0.583,0.583,0.583h1.167v14
+                                c0,0.644,0.522,1.166,1.167,1.166h12.833c0.645,0,1.168-0.522,1.168-1.166v-14h1.166c0.322,0,0.584-0.261,0.584-0.583
+                                C19.334,3.261,19.072,3,18.75,3z M8.25,1.833h3.5V3h-3.5V1.833z M16.416,17.584c0,0.322-0.262,0.583-0.582,0.583H4.167
+                                c-0.322,0-0.583-0.261-0.583-0.583V4.167h12.833V17.584z M14.084,8.25h-1.168v7h1.168V8.25z M10.583,7.083H9.417v8.167h1.167V7.083
+                                z"></path>
+                    </svg>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+
+
+
+@code {
+    // Initialize the variable for expenses.
+    List<Expense> expenses = new List<Expense>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await ExpenseService.GetExpensesAsync();
+        expenses = ExpenseService.Expenses;
+    }
+
+    private async void OpenEditForm(int id)
+    {
+        NavigationManager.NavigateTo($"/expense/{id}");
+    }
+}

@@ -1,0 +1,51 @@
+﻿@page "/expense/{id:int}"
+@page "/expense"
+@inject IExpenseService ExpenseService
+@inject NavigationManager NavigationManager
+
+<h3>ExpenseForm</h3>
+
+<EditForm Model="@Expense" OnSubmit="HandleSubmit">
+    <div style="display:flex; flex-direction:column; max-width: 500px">
+        <label for="title">Title</label>
+        <InputText id="title" @bind-Value="Expense.Title" />
+
+        <label for="description" style="margin-top:16px">Description </label>
+        <InputText id="description" @bind-Value="Expense.Description" />
+
+        <label for="amount" style="margin-top:16px">Amount</label>
+        <InputNumber id="amount" @bind-Value="Expense.Amount" />
+
+        <button type="submit" style="margin-top:32px; width:150px;">Submit</button>
+    </div>
+
+
+</EditForm>
+
+@code {
+    [Parameter] public int Id { get; set; }
+    public Expense Expense { get; set; } = new Expense();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Id != 0)
+        {
+            Expense = await ExpenseService.GetExpenseDetailsAsync(Id);
+        }
+    }
+
+    private async void HandleSubmit()
+    {
+        if (Id == 0)
+        {
+            await ExpenseService.CreateExpenseAsync(Expense);
+        }
+        else
+        {
+            await ExpenseService.EditExpenseAsync(Expense, Expense.Id);
+        }
+
+        NavigationManager.NavigateTo("/");
+        StateHasChanged();
+    }
+}
